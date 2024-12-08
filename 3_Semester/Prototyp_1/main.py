@@ -16,3 +16,5 @@ def analyze_pdfs(folder_path):
 
 if __name__ == "__main__":
     analyze_pdfs("./data")
+
+
