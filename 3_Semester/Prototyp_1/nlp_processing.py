@@ -9,3 +9,13 @@ def analyze_text(text):
         "entities": [(ent.text, ent.label_) for ent in doc.ents],
         "sentences": [sent.text for sent in doc.sents]
     }
+
+
+
+#def analyze_text(text="Dies ist ein Beispielsatz.FH Technikum ist in Wien."):
+#    """Analysiert den Text & extrahiert Entitäten & Sätze."""
+#    doc = nlp(text)
+#    return {
+#        "entities": [(ent.text, ent.label_) for ent in doc.ents],
+#        "sentences": [sent.text for sent in doc.sents]
+#    }
