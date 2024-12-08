@@ -2,6 +2,7 @@ import os
 from pdf_reader import read_pdf, clean_text
 from nlp_processing import analyze_text
 
+
 def analyze_pdfs(folder_path):
     pdf_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.pdf')]
     if not pdf_files:
@@ -16,5 +17,3 @@ def analyze_pdfs(folder_path):
 
 if __name__ == "__main__":
     analyze_pdfs("./data")
-
-
