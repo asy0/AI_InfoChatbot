@@ -31,11 +31,8 @@ def analyze_text_hardcoded():
 
 if __name__ == "__main__":
     results = analyze_text_hardcoded()
-
-    print("\nEntitäten:")
-    for entity, label in results["entities"]:
-        print(f" - {entity} ({label})")
-
+    print("\n Entitäten:")
+    print(" \n".join([f" - {entity} ({label})" for entity, label in results["entities"]]))
     print("\nSätze:")
-    for sentence in results["sentences"]:
-        print(f" - {sentence}")
+    print("\n".join(f" - {sentence}" for sentence in results["sentences"]))
+
