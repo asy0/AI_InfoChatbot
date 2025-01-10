@@ -1,6 +1,6 @@
 import spacy
 
-nlp = spacy.load('de_core_news_lg') 
+nlp = spacy.load('de_core_news_lg')
 
 
 def analyze_text_hardcoded():
