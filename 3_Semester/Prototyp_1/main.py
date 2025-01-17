@@ -17,7 +17,7 @@ def analyze_pdfs(folder_path):
             raw_text = read_pdf(pdf_path)
             print(f"Extrahierter Text (erste 500 Zeichen): {raw_text[:1500]}...\n")
             cleaned_text = clean_text(raw_text)
-            print(f"Bereinigter Text (erste 500 Zeichen): {cleaned_text[:1500]}...\n")
+            print(f"Bereinigter Text (erste 500 Zeichen): {cleaned_text[:10000]}...\n")
             results = analyze_text(cleaned_text)
             print("\nEntitäten:")
             print(*[f" - {entity} ({label})" for entity, label in results["entities"]], sep="\n")
