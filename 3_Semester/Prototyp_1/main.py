@@ -1,6 +1,8 @@
 import os
 from pdf_reader import read_pdf, clean_text
-from nlp_processing import analyze_text
+from nlp_processing import analyze_text, extract_complete_sentences
+
+
 
 def analyze_pdfs(folder_path):
     # Alle PDF-Dateien im Ordner finden
@@ -15,19 +17,27 @@ def analyze_pdfs(folder_path):
         try:
 
             raw_text = read_pdf(pdf_path)
-            print(f"Extrahierter Text (erste 500 Zeichen): {raw_text[:1500]}...\n")
+            print(f"\nExtrahierter Text (erste 500 Zeichen): {raw_text[:500]}...\n")
             cleaned_text = clean_text(raw_text)
-            print(f"Bereinigter Text (erste 500 Zeichen): {cleaned_text[:10000]}...\n")
+            print("\n-------------------")
+            print(f"\nBereinigter Text (erste 500 Zeichen): {cleaned_text[:500]}...\n")
             results = analyze_text(cleaned_text)
-            print("\nEntitäten:")
-            print(*[f" - {entity} ({label})" for entity, label in results["entities"]], sep="\n")
+            print("\n-------------------")
+            print(f"\nEntitäten für {os.path.basename(pdf_path)}:")
+            for entity, label, count, positions in results["entities"]:
+                print(f" - {entity} ({label}) - {count} mal, Positionen: {positions}")
 
-            print("\nSätze:")
-            print(*[f" - {sentence}" for sentence in results["sentences"][:5]], sep="\n")  # Nur die ersten 5 Sätze
+            print("\n-------------------")
+            print("\nVollständige Sätze:")
+            complete_sentences = extract_complete_sentences(raw_text)
+            print(*[f" - {sentence}" for sentence in complete_sentences[:5]], sep="\n")  # Nur die ersten 5 Sätze
 
         except Exception as e:
             print(f"Fehler bei der Verarbeitung von {os.path.basename(pdf_path)}: {e}")
 
+
 if __name__ == "__main__":
-    folder_path = "./data"
+    # Ordnerpfad relativ zum aktuellen Skript
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    folder_path = os.path.join(script_dir, "data")
     analyze_pdfs(folder_path)
