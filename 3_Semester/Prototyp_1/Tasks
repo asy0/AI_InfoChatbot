@@ -13,5 +13,3 @@ nlp_processing: Spacy analysiert Text mit de_core_news_lg. Es findet benannte En
 pdf_Reader: PyMuPDF liest PDF-Text. Die Funktion clean_text macht ihn sauberer(Sonderzeichen entfernen&Leerzeichen reduzieren9.
 ______________________________________________________________
 __________________________________________________________
-2) AUFGABEN:
---- Prototyp 1.2 ---

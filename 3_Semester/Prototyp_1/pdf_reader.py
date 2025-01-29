@@ -10,7 +10,7 @@ def read_pdf(file_path):
         with fitz.open(file_path) as doc:
             extracted_text = []
             for page_num, page in enumerate(doc, start=1):
-                text = page.get_text("text")  # Direktes Extrahieren des Fließtextes
+                text = page.get_text("text")  # Text extrahieren
                # print(f"Seite {page_num}: {text[:500]}")  # Debug-Ausgabe für jede Seite
                 extracted_text.append(text)
             return "\n".join(extracted_text)

@@ -3,7 +3,6 @@ from pdf_reader import read_pdf, clean_text
 from nlp_processing import analyze_text, extract_complete_sentences
 
 
-
 def analyze_pdfs(folder_path):
     # Alle PDF-Dateien im Ordner finden
     pdf_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.pdf')]
@@ -15,7 +14,6 @@ def analyze_pdfs(folder_path):
         print(f"\nAnalysiere: {os.path.basename(pdf_path)}")
 
         try:
-
             raw_text = read_pdf(pdf_path)
             print(f"\nExtrahierter Text (erste 500 Zeichen): {raw_text[:500]}...\n")
             cleaned_text = clean_text(raw_text)
