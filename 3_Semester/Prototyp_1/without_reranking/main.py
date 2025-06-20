@@ -1,8 +1,7 @@
 import os
 import pickle
 from pdf_reader import read_pdf, clean_text
-from nlp_processing import analyze_text, extract_paragraphs, extract_sentences, embed_sentences
-from cross_encoder_reranker import rerank_with_cross_encoder as find_best_match
+from nlp_processing import analyze_text, extract_paragraphs, extract_sentences, embed_sentences, find_best_match
 from nlp_processing import expand_query
 
 
