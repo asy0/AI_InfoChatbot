@@ -215,7 +215,7 @@ if __name__ == "__main__":
                 print(f"{best_match[0][0]}  [📄 {best_match[0][2]} | 🔍 Score: {best_match[1]:.2f}]")
 
                 print("\n\n Weitere relevante Antworten:\n")
-                for (sentence, _, source), score in matches[1:]:
+                for (sentence, _, source), score in matches[1:4]:
                     print(f"- {sentence}  [📄 {source} | 🔍 Score: {score:.2f}]")
             else:
                 print("Keine passenden Antworten gefunden.\n")
