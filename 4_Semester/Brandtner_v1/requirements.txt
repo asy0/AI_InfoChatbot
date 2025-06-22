@@ -1,0 +1,4 @@
+spacy
+PyMuPDF
+sentence-transformers
+scikit-learn
