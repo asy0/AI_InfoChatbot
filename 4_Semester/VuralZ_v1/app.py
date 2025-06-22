@@ -1,3 +1,15 @@
+"""
+FH Technikum Wien Info Chatbot
+==================================================
+
+Entwicklerin: Zeliha Vural
+Projekt: FH Technikum Wien Info Chatbot (4. Semester, Gruppe 04, Inno2)
+Datum: Juni 2025
+Beschreibung: Automatisierte Bewertungsplattform zur Qualitätsmessung von Chatbot-Antworten
+             mittels Vektor-basierter Ähnlichkeitssuche und FAISS-Datenbank.
+Hinweis: Individueller Prototyp im Rahmen der Gruppenarbeit 
+"""
+
 import streamlit as st
 import pandas as pd
 import torch
@@ -13,13 +25,21 @@ import fitz  # PyMuPDF
 import re
 
 # Titel
-st.title("📚 FH Technikum Wien – Info Chatbot Bewertung")
+st.title("📚 FH Technikum Wien – Info Chatbot ")
+
+# Entwickler-Information
+st.markdown("---")
+st.markdown("**👩‍💻 Entwickelt von:** Zeliha Vural")
+st.markdown("**📋 Projekt:** FH Technikum Wien Info Chatbot (4. Semester, Gruppe 04, Inno2)")
+st.markdown("**📅 Datum:** 2025")
+#st.markdown("**ℹ️ Hinweis:** Individueller Prototyp im Rahmen der Gruppenarbeit")
+st.markdown("---")
 
 # Funktion zum Laden und Aufbereiten der PDF-Dokumente
 def load_pdf_documents(data_folder="../data"):
     documents = []
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,  # Kleinere Chunks für präzisere Antworten
+        chunk_size=500,  # Klein= für präzisere Antworten
         chunk_overlap=100,
         length_function=len,
         separators=["\n\n", "\n", ". ", " ", ""]
@@ -37,7 +57,7 @@ def load_pdf_documents(data_folder="../data"):
                 doc = fitz.open(pdf_path)
                 full_text = ""
                 
-                # Extrahiere Text von allen Seiten
+                # Text von allen Seiten extrahieren
                 for page_num in range(len(doc)):
                     page = doc.load_page(page_num)
                     text = page.get_text().strip()
@@ -45,12 +65,12 @@ def load_pdf_documents(data_folder="../data"):
                 
                 doc.close()
                 
-                # Teile den Text in kleinere Chunks auf
+                # Text in kleinere Chunks aufteilen
                 if full_text.strip():
                     chunks = text_splitter.split_text(full_text)
                     
                     for i, chunk in enumerate(chunks):
-                        if len(chunk.strip()) > 50:  # Mindestens 50 Zeichen
+                        if len(chunk.strip()) > 50:  # Mind.50 Zeichen
                             # Finde die Seitennummer aus dem Chunk
                             page_match = re.search(r'Seite (\d+):', chunk)
                             page_num = int(page_match.group(1)) if page_match else 1
@@ -71,69 +91,66 @@ def load_pdf_documents(data_folder="../data"):
         st.error(f"❌ Fehler beim Laden der PDF-Dokumente: {e}")
         return []
 
-# Lade PDF-Dokumente
 pdf_documents = load_pdf_documents()
 
 if not pdf_documents:
     st.error("❌ Keine PDF-Dokumente gefunden. Bitte stellen Sie sicher, dass PDF-Dateien im 'data' Ordner vorhanden sind.")
     st.stop()
 
-# Lade CSV-Datei mit Testfragen
+#CSV-Datei laden
 csv_path = "testset.csv"
 try:
     test_data = pd.read_csv(csv_path)
-    st.success(f"✅ {len(test_data)} Testfragen aus CSV geladen")
+    #st.success(f"✅ {len(test_data)} Testfragen aus CSV geladen")
 except Exception as e:
     st.error(f"❌ Fehler beim Laden der CSV-Datei: {e}")
     st.stop()
 
-# Initialisiere Embedding-Modell
+# Embedding-Modell
 embedding_model = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
 
-# FAISS-Datenbank aus PDF-Dokumenten erstellen
-st.info("🔧 Erstelle Vektordatenbank aus PDF-Dokumenten...")
+# FAISS-Datenbank a erstellen
+#st.info("🔧 Erstelle Vektordatenbank aus PDF-Dokumenten...")
 db = FAISS.from_documents(pdf_documents, embedding=embedding_model)
 st.success("✅ Vektordatenbank erfolgreich erstellt")
 
-# Funktion zum Extrahieren der exakten Antwort
+
 def extract_exact_answer(found_text, reference_answer, max_context=200):
     """
     Extrahiert die exakte Antwort aus dem gefundenen Text
     """
-    # Normalisiere Texte für besseren Vergleich
+    #Texte für besseren Vergleich
     found_lower = found_text.lower()
     ref_lower = reference_answer.lower()
     
-    # Suche nach der Referenzantwort im gefundenen Text
+    # Referenzantwort im gefundenen Text suchen
     if ref_lower in found_lower:
         start_pos = found_lower.find(ref_lower)
         end_pos = start_pos + len(reference_answer)
         
-        # Extrahiere die Antwort mit etwas Kontext
+        # Antwort mit etwas Kontext extrahieern
         context_start = max(0, start_pos - max_context)
         context_end = min(len(found_text), end_pos + max_context)
         
         extracted = found_text[context_start:context_end]
         
-        # Versuche, bei Satzenden abzuschneiden
+        # Satzenden abschneiden
         sentences = extracted.split('. ')
         if len(sentences) > 1:
-            # Finde den Satz, der die Referenzantwort enthält
             for i, sentence in enumerate(sentences):
                 if ref_lower in sentence.lower():
-                    # Gib den relevanten Satz zurück
                     return sentence.strip() + '.'
         
         return extracted.strip()
     
-    # Fallback: Suche nach ähnlichen Phrasen
+    # Nach ähnlichen Phrasen scuhen
     ref_words = reference_answer.lower().split()
     best_match = ""
     best_score = 0
     
-    # Teile den Text in Sätze auf
+    # Text in Sätze aufteilen
     sentences = found_text.split('. ')
     for sentence in sentences:
         sentence_lower = sentence.lower()
@@ -144,8 +161,7 @@ def extract_exact_answer(found_text, reference_answer, max_context=200):
     
     if best_match:
         return best_match
-    
-    # Letzter Fallback: Gib den ursprünglichen Text zurück
+
     return found_text
 
 # Vereinfachte und effektivere Suche
@@ -153,16 +169,16 @@ def find_best_answer(query, referenz, embedding_model, db, k=50):
     """
     Findet die beste Antwort durch direkten Vergleich aller Dokumente
     """
-    # Hole alle ähnlichen Dokumente
+    # alle ähnlichen Dokumente holen
     docs = db.similarity_search(query, k=k)
     
     best_doc = None
     best_score = -1
     
-    # Vergleiche jedes Dokument direkt mit der Referenzantwort
+    # jedes Dokument direkt mit der Referenzantwort vergleichen
     for doc in docs:
         try:
-            # Berechne Ähnlichkeit zwischen Referenz und Dokument
+            # Ähnlichkeit zwischen Referenz&Dokument berechnen
             ref_emb = embedding_model.embed_query(referenz)
             doc_emb = embedding_model.embed_query(doc.page_content)
             score = cosine_similarity([ref_emb], [doc_emb])[0][0]
@@ -175,7 +191,7 @@ def find_best_answer(query, referenz, embedding_model, db, k=50):
     
     return best_doc, best_score
 
-# Funktion zum sauberen Zuschneiden von Text
+
 def clean_text_truncation(text, max_length=1500):
     """
     Schneidet Text sauber ab, ohne mitten im Satz zu enden
@@ -186,8 +202,7 @@ def clean_text_truncation(text, max_length=1500):
     # Versuche, bei einem Satzende abzuschneiden
     truncated = text[:max_length]
     
-    # Suche nach dem letzten vollständigen Satz
-    # Verschiedene Satzenden berücksichtigen
+    # Suche nach dem letzten vollständigen Satz& Verschiedene Satzenden berücksichtigen
     sentence_endings = ['. ', '! ', '? ', '.\n', '!\n', '?\n', '.\r\n', '!\r\n', '?\r\n']
     last_sentence_end = -1
     
@@ -197,15 +212,14 @@ def clean_text_truncation(text, max_length=1500):
             last_sentence_end = pos + len(ending) - 1
     
     # Wenn ein Satzende gefunden wurde und es nicht zu früh ist
-    if last_sentence_end > max_length * 0.5:  # Mindestens 50% der Länge nutzen
+    if last_sentence_end > max_length * 0.5:  # Mind 50% der Länge nutzen
         return text[:last_sentence_end + 1]
     
-    # Fallback: Suche nach dem letzten vollständigen Wort
+    # Suche nach dem letzten vollständigen Wort
     last_space = truncated.rfind(' ')
-    if last_space > max_length * 0.6:  # Mindestens 60% der Länge nutzen
+    if last_space > max_length * 0.6:  # Mind. 60%
         return text[:last_space] + "..."
-    
-    # Letzter Fallback: Zeige den vollen Text, auch wenn er lang ist
+
     return text
 
 # Hauptlogik zur Verarbeitung
@@ -234,36 +248,34 @@ for idx, row in test_data.iterrows():
             st.warning(f"❌ Keine passende Antwort für Frage {idx + 1} gefunden.")
             continue
         
-        # Extrahiere die exakte Antwort aus dem gefundenen Text
+        # die exakte Antwort aus dem gefundenen Text
         full_text = best_doc.page_content.strip()
         extracted_answer = extract_exact_answer(full_text, referenz)
         source_info = best_doc.metadata
         
-        # Berechne den Score für die extrahierte Antwort
+        # Score für die extrahierte Antwort berechnen
         try:
             ref_emb = embedding_model.embed_query(referenz)
             extracted_emb = embedding_model.embed_query(extracted_answer)
             similarity_score = cosine_similarity([ref_emb], [extracted_emb])[0][0]
         except Exception:
-            # Fallback: Verwende den ursprünglichen Score
             pass
         
     except Exception as e:
         st.warning(f"❌ Fehler bei Suche in Frage {idx + 1}: {e}")
         continue
 
-    # Bewertung basierend auf Ähnlichkeit - ANGEPASSTE SCHWELLEN für bessere Ergebnisse
-    if similarity_score > 0.75:  # Niedriger für mehr "Vollständig"
+    # Bewertung basierend auf Ähnlichkeit
+    if similarity_score > 0.75:
         bewertung = "🟢 Vollständig"
-    elif similarity_score >= 0.45:  # Niedriger für mehr "Teilweise"
+    elif similarity_score >= 0.45:
         bewertung = "🟡 Teilweise"
     else:
         bewertung = "🔴 Unzureichend"
 
-    # Saubere Textanzeige ohne Zuschneiden mitten im Satz
     display_text = clean_text_truncation(extracted_answer, max_length=1500)
 
-    # Anzeige - zurück zu normaler Markdown-Anzeige
+
     st.markdown(f"**Frage {idx+1}:** {frage}")
     st.markdown(f"**Bewertung:** {bewertung}  \n📈 Score: `{similarity_score:.3f}`")
     st.markdown(f"**🔹 Erwartet:** {referenz}")
@@ -284,7 +296,6 @@ for idx, row in test_data.iterrows():
     # Fortschrittsbalken aktualisieren
     progress_bar.progress((idx + 1) / len(test_data))
 
-# Ergebnisse in DataFrame umwandeln
 results_df = pd.DataFrame(results)
 
 # Zusammenfassung
