@@ -11,5 +11,6 @@
 .idea/modules.xml
 .idea/vcs.xml
 .idea/workspace.xml
-
-
+4_Semester/Brandtner_v1/__pycache__/
+*.pyc
+*.pkl
