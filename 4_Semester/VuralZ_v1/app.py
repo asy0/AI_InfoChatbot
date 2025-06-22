@@ -32,7 +32,6 @@ st.markdown("---")
 st.markdown("**👩‍💻 Entwickelt von:** Zeliha Vural")
 st.markdown("**📋 Projekt:** FH Technikum Wien Info Chatbot (4. Semester, Gruppe 04, Inno2)")
 st.markdown("**📅 Datum:** 2025")
-#st.markdown("**ℹ️ Hinweis:** Individueller Prototyp im Rahmen der Gruppenarbeit")
 st.markdown("---")
 
 # Funktion zum Laden und Aufbereiten der PDF-Dokumente
